@@ -7,7 +7,7 @@
 	<category>users</category>
 	<description>LinkedIn API integrations for Elgg HybridAuth</description>
 	<website>http://www.arckinteractive.com/</website>
-	<copyright>See COPYRIGHT.txt</copyright>
+	<copyright>2013 (c) ArckInteractive LLC</copyright>
 	<license>GNU General Public License version 2</license>
 	<requires>
 		<type>elgg_release</type>
