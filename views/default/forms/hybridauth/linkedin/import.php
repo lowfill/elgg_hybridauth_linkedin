@@ -183,7 +183,7 @@ if ($tag_names) {
 	echo '</fieldset>';
 }
 
-$linkedin_api_result = $adapter->adapter->api->profile("~:(positions:(id,title,company:(name)),projects:(id,name),educations:(id,degree,school-name,field-of-study),publications:(id,title),patents:(id,title),certifications:(id,name,authority),courses:(id,name),volunteer:(volunteer-experiences:(id,role,organization)),recommendations-received:(id,recommendation-type,recommender))");
+$linkedin_api_result = $adapter->adapter->api->profile("~:(positions:(id,title,company:(name)),projects:(id,name),educations:(id,degree,school-name,field-of-study),publications:(id,title),patents:(id,title),certifications:(id,name,authority),courses:(id,name),volunteer:(volunteer-experiences:(id,role,organization)),recommendations-received:(id,recommender))");
 $linkedin_json_result = $linkedin_api_result['linkedin'];
 $linkedin = json_decode($linkedin_json_result);
 
@@ -321,8 +321,118 @@ if (LINKEDIN_PATENT_SUBTYPE) {
 }
 
 
+if (LINKEDIN_CERTIFICATION_SUBTYPE) {
+	
+	if ($linkedin->certifications->_total > 0) {
+
+		foreach ($linkedin->certifications->values as $certification) {
+			$label = elgg_echo('hybridauth:linkedin:certifications:label', array($certification->name, $certification->authority->name));
+			$certifications_options[$label] = $certification->id;
+		}
+
+		echo '<fieldset>';
+		echo '<legend>' . elgg_echo('hybridauth:linkedin:certifications') . '</legend>';
+
+		echo '<label>' . elgg_echo('hybridauth:linkedin:certifications:select') . '</label>';
+		echo elgg_view('input/checkboxes', array(
+			'name' => 'certifications',
+			'options' => $certifications_options
+		));
+
+		echo '<label>' . elgg_echo('hybridauth:linkedin:certifications:access') . '</label>';
+		echo elgg_view('input/access', array(
+			'name' => 'accesslevel[certifications]'
+		));
+
+		echo '</fieldset>';
+	}
+}
 
 
+if (LINKEDIN_COURSE_SUBTYPE) {
+
+	if ($linkedin->courses->_total > 0) {
+
+		foreach ($linkedin->courses->values as $course) {
+			$courses_options[$course->name] = $course->id;
+		}
+
+		echo '<fieldset>';
+		echo '<legend>' . elgg_echo('hybridauth:linkedin:courses') . '</legend>';
+
+		echo '<label>' . elgg_echo('hybridauth:linkedin:courses:select') . '</label>';
+		echo elgg_view('input/checkboxes', array(
+			'name' => 'courses',
+			'options' => $courses_options
+		));
+
+		echo '<label>' . elgg_echo('hybridauth:linkedin:courses:access') . '</label>';
+		echo elgg_view('input/access', array(
+			'name' => 'accesslevel[courses]'
+		));
+
+		echo '</fieldset>';
+	}
+}
+
+if (LINKEDIN_VOLUNTEER_SUBTYPE) {
+
+	/**
+	 * @todo: add 'causes', 'supportedOrganizations'
+	 */
+
+	if ($linkedin->volunteer->volunteerExperiences->_total > 0) {
+
+		foreach ($linkedin->volunteer->volunteerExperiences->values as $volunteer_experience) {
+			$label = elgg_echo('hybridauth:linkedin:volunteer_experiences:label', array($volunteer_experience->role, $volunteer_experience->organization->name));
+			$volunteer_experiences_options[$label] = $volunteer_experience->id;
+		}
+
+		echo '<fieldset>';
+		echo '<legend>' . elgg_echo('hybridauth:linkedin:volunteer_experiences') . '</legend>';
+
+		echo '<label>' . elgg_echo('hybridauth:linkedin:volunteer_experiences:select') . '</label>';
+		echo elgg_view('input/checkboxes', array(
+			'name' => 'volunteer_experiences',
+			'options' => $volunteer_experiences_options
+		));
+
+		echo '<label>' . elgg_echo('hybridauth:linkedin:volunteer_experiences:access') . '</label>';
+		echo elgg_view('input/access', array(
+			'name' => 'accesslevel[volunteer_experiences]'
+		));
+
+		echo '</fieldset>';
+	}
+}
+
+
+if (LINKEDIN_RECOMMENDATION_SUBTYPE) {
+
+	if ($linkedin->recommendationsReceived->_total > 0) {
+
+		foreach ($linkedin->recommendationsReceived->values as $recommendation) {
+			$label = elgg_echo('hybridauth:linkedin:recommendations:label', array($recommendation->recommender->firstName, $recommendation->recommender->lastName));
+			$recommendations_options[$label] = $recommendation->id;
+		}
+
+		echo '<fieldset>';
+		echo '<legend>' . elgg_echo('hybridauth:linkedin:recommendations') . '</legend>';
+
+		echo '<label>' . elgg_echo('hybridauth:linkedin:recommendations:select') . '</label>';
+		echo elgg_view('input/checkboxes', array(
+			'name' => 'recommendations',
+			'options' => $recommendations_options
+		));
+
+		echo '<label>' . elgg_echo('hybridauth:linkedin:recommendations:access') . '</label>';
+		echo elgg_view('input/access', array(
+			'name' => 'accesslevel[recommendations]'
+		));
+
+		echo '</fieldset>';
+	}
+}
 
 echo '<div class="elgg-foot">';
 echo elgg_view('input/submit');

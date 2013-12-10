@@ -35,7 +35,15 @@ function elgg_hybridauth_linkedin_init() {
 	elgg_register_plugin_hook_handler('linkedin:fields', 'profile', 'elgg_hybridauth_linkedin_fields');
 
 	// Register widgets for LinkedIn data
-	elgg_register_widget_type('linkedin', elgg_echo('hybridauth:linkedin:widget:background'), elgg_echo('hybridauth:linkedin:widget:background:desc'), 'profile', false);
+	elgg_register_widget_type('employment', elgg_echo('hybridauth:linkedin:widget:employment'), elgg_echo('hybridauth:linkedin:widget:employment:desc'), 'profile', false);
+	elgg_register_widget_type('projects', elgg_echo('hybridauth:linkedin:widget:projects'), elgg_echo('hybridauth:linkedin:widget:projects:desc'), 'profile', false);
+	elgg_register_widget_type('education', elgg_echo('hybridauth:linkedin:widget:education'), elgg_echo('hybridauth:linkedin:widget:education:desc'), 'profile', false);
+	elgg_register_widget_type('publications', elgg_echo('hybridauth:linkedin:widget:publications'), elgg_echo('hybridauth:linkedin:widget:publications:desc'), 'profile', false);
+	elgg_register_widget_type('patents', elgg_echo('hybridauth:linkedin:widget:patents'), elgg_echo('hybridauth:linkedin:widget:patents:desc'), 'profile', false);
+	elgg_register_widget_type('certification', elgg_echo('hybridauth:linkedin:widget:certification'), elgg_echo('hybridauth:linkedin:widget:certification:desc'), 'profile', false);
+	elgg_register_widget_type('courses', elgg_echo('hybridauth:linkedin:widget:courses'), elgg_echo('hybridauth:linkedin:widget:courses:desc'), 'profile', false);
+	elgg_register_widget_type('volunteer_experiences', elgg_echo('hybridauth:linkedin:widget:volunteer_experiences'), elgg_echo('hybridauth:linkedin:widget:volunteer_experiences:desc'), 'profile', false);
+	elgg_register_widget_type('recommendations', elgg_echo('hybridauth:linkedin:widget:recommendations'), elgg_echo('hybridauth:linkedin:widget:recommendations:desc'), 'profile', false);
 }
 
 /**

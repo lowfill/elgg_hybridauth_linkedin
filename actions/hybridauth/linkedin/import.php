@@ -269,4 +269,379 @@ if (is_array($educations_input)) {
 	}
 }
 
+
+$publications_input = get_input('publications');
+
+if (is_array($publications_input)) {
+
+	$user_publications = elgg_get_entities_from_metadata(array(
+		'types' => 'object',
+		'subtypes' => LINKEDIN_PUBLICATION_SUBTYPE,
+		'owner_guid' => $user->guid,
+		'metadata_names' => 'linkedin_id',
+		'limit' => false
+	));
+
+	$linkedin = array();
+	if ($user_publications) {
+		foreach ($user_publications as $user_publication) {
+			$linkedin[$user_publication->linkedin_id] = $user_publication;
+		}
+	}
+
+	$publications_api_result = $adapter->adapter->api->profile("~:(publications:(id,title,publisher,authors,date,url,summary))");
+	$publications_json_result = $publications_api_result['linkedin'];
+	$publications = json_decode($publications_json_result);
+
+	foreach ($publications->publications->values as $publication) {
+		if (!in_array($publication->id, $publications_input)) {
+			continue;
+		}
+
+		if ($linkedin[$publication->id]) {
+			$action = 'update';
+			$object = $linkedin[$publication->id];
+		} else {
+			$action = 'import';
+			$object = new ElggObject();
+			$object->subtype = LINKEDIN_PUBLICATION_SUBTYPE;
+			$object->owner_guid = $user->guid;
+			$object->access_id = elgg_extract('publications', $access_input, get_default_access($user));
+
+			$object->linkedin_id = $publication->id;
+		}
+
+		$object->title = $publication->title;
+		$object->description = $publication->summary;
+		$object->address = $publication->url;
+		$object->date = mktime(0, 0, 0, $publication->date->month, $publication->date->day, $publication->date->year);
+		$object->publisher = $publication->publisher->name;
+
+		if ($publication->authors->_total > 0) {
+			foreach ($publication->authors->values as $author) {
+				$pub_authors[] = ($author->person) ? "{$author->person->firstName} {$author->person->lastName}" : $author->name;
+				if ($author->person) {
+					$pub_authors_ids[] = $author->person->id;
+				}
+			}
+			$object->authors = $pub_authors;
+			$object->author_linkedin_id = $pub_authors_ids;
+		}
+
+		if ($object->save()) {
+			system_message(elgg_echo('hybridauth:linkedin:publication:success:' . $action, array($object->title)));
+		} else {
+			system_message(elgg_echo('hybridauth:linkedin:publication:error', array($object->title)));
+		}
+	}
+}
+
+
+$patents_input = get_input('patents');
+
+if (is_array($patents_input)) {
+
+	$user_patents = elgg_get_entities_from_metadata(array(
+		'types' => 'object',
+		'subtypes' => LINKEDIN_PATENT_SUBTYPE,
+		'owner_guid' => $user->guid,
+		'metadata_names' => 'linkedin_id',
+		'limit' => false
+	));
+
+	$linkedin = array();
+	if ($user_patents) {
+		foreach ($user_patents as $user_patent) {
+			$linkedin[$user_patent->linkedin_id] = $user_patent;
+		}
+	}
+
+	$patents_api_result = $adapter->adapter->api->profile("~:(patents:(id,title,summary,number,status,office,inventors,date,url))");
+	$patents_json_result = $patents_api_result['linkedin'];
+	$patents = json_decode($patents_json_result);
+
+	foreach ($patents->patents->values as $patent) {
+		if (!in_array($patent->id, $patents_input)) {
+			continue;
+		}
+
+		if ($linkedin[$patent->id]) {
+			$action = 'update';
+			$object = $linkedin[$patent->id];
+		} else {
+			$action = 'import';
+			$object = new ElggObject();
+			$object->subtype = LINKEDIN_PATENT_SUBTYPE;
+			$object->owner_guid = $user->guid;
+			$object->access_id = elgg_extract('patents', $access_input, get_default_access($user));
+
+			$object->linkedin_id = $patent->id;
+		}
+
+		$object->title = $patent->title;
+		$object->description = $patent->summary;
+		$object->number = $patent->number;
+		$object->office = $patent->office->name;
+		$object->status = $patent->status;
+		$object->address = $patent->url;
+		$object->date = mktime(0, 0, 0, $patent->date->month, $patent->date->day, $patent->date->year);
+
+		if ($patent->inventors->_total > 0) {
+			foreach ($patent->inventors->values as $inventor) {
+				$patent_inventors[] = ($inventor->person) ? "{$inventor->person->firstName} {$inventor->person->lastName}" : $inventor->name;
+				if ($inventor->person) {
+					$patent_inventor_ids[] = $inventor->person->id;
+				}
+			}
+			$object->inventors = $patent_inventors;
+			$object->inventor_linkedin_ids = $patent_inventor_ids;
+		}
+
+		if ($object->save()) {
+			system_message(elgg_echo('hybridauth:linkedin:patent:success:' . $action, array($object->title)));
+		} else {
+			system_message(elgg_echo('hybridauth:linkedin:patent:error', array($object->title)));
+		}
+	}
+}
+
+$certifications_input = get_input('certifications');
+
+if (is_array($certifications_input)) {
+
+	$user_certifications = elgg_get_entities_from_metadata(array(
+		'types' => 'object',
+		'subtypes' => LINKEDIN_CERTIFICATION_SUBTYPE,
+		'owner_guid' => $user->guid,
+		'metadata_names' => 'linkedin_id',
+		'limit' => false
+	));
+
+	$linkedin = array();
+	if ($user_certifications) {
+		foreach ($user_certifications as $user_certification) {
+			$linkedin[$user_certification->linkedin_id] = $user_certification;
+		}
+	}
+
+	$certifications_api_result = $adapter->adapter->api->profile("~:(certifications:(id,name,authority,number,start-date,end-date,url))");
+	$certifications_json_result = $certifications_api_result['linkedin'];
+	$certifications = json_decode($certifications_json_result);
+
+	foreach ($certifications->certifications->values as $certification) {
+		if (!in_array($certification->id, $certifications_input)) {
+			continue;
+		}
+
+		if ($linkedin[$certification->id]) {
+			$action = 'update';
+			$object = $linkedin[$certification->id];
+		} else {
+			$action = 'import';
+			$object = new ElggObject();
+			$object->subtype = LINKEDIN_CERTIFICATION_SUBTYPE;
+			$object->owner_guid = $user->guid;
+			$object->access_id = elgg_extract('certifications', $access_input, get_default_access($user));
+
+			$object->linkedin_id = $certification->id;
+		}
+
+		$object->title = $certification->name;
+		$object->description = '';
+		$object->number = $certification->number;
+		$object->authority = $certification->authority->name;
+		$object->address = $certification->url;
+		
+		if ($certification->startDate) {
+			$object->calendar_start = mktime(0, 0, 0, $certification->startDate->month, $certification->startDate->day, $certification->startDate->year);
+		}
+		if ($certification->endDate) {
+			$object->calendar_end = mktime(0, 0, 0, $certification->endDate->month, $certification->endDate->day, $certification->endDate->year);
+		}
+
+		if ($object->save()) {
+			system_message(elgg_echo('hybridauth:linkedin:certification:success:' . $action, array($object->title)));
+		} else {
+			system_message(elgg_echo('hybridauth:linkedin:certification:error', array($object->title)));
+		}
+	}
+}
+
+$courses_input = get_input('courses');
+
+if (is_array($courses_input)) {
+
+	$user_courses = elgg_get_entities_from_metadata(array(
+		'types' => 'object',
+		'subtypes' => LINKEDIN_COURSE_SUBTYPE,
+		'owner_guid' => $user->guid,
+		'metadata_names' => 'linkedin_id',
+		'limit' => false
+	));
+
+	$linkedin = array();
+	if ($user_courses) {
+		foreach ($user_courses as $user_course) {
+			$linkedin[$user_course->linkedin_id] = $user_course;
+		}
+	}
+
+	$courses_api_result = $adapter->adapter->api->profile("~:(courses:(id,name,number))");
+	$courses_json_result = $courses_api_result['linkedin'];
+	$courses = json_decode($courses_json_result);
+
+	foreach ($courses->courses->values as $course) {
+		if (!in_array($course->id, $courses_input)) {
+			continue;
+		}
+
+		if ($linkedin[$course->id]) {
+			$action = 'update';
+			$object = $linkedin[$course->id];
+		} else {
+			$action = 'import';
+			$object = new ElggObject();
+			$object->subtype = LINKEDIN_COURSE_SUBTYPE;
+			$object->owner_guid = $user->guid;
+			$object->access_id = elgg_extract('courses', $access_input, get_default_access($user));
+
+			$object->linkedin_id = $course->id;
+		}
+
+		$object->title = $course->name;
+		$object->description = '';
+		$object->number = $course->number;
+
+		if ($object->save()) {
+			system_message(elgg_echo('hybridauth:linkedin:course:success:' . $action, array($object->title)));
+		} else {
+			system_message(elgg_echo('hybridauth:linkedin:course:error', array($object->title)));
+		}
+	}
+}
+
+
+$volunteer_experiences_input = get_input('volunteer_experiences');
+
+if (is_array($volunteer_experiences_input)) {
+
+	$user_volunteer_experiences = elgg_get_entities_from_metadata(array(
+		'types' => 'object',
+		'subtypes' => LINKEDIN_VOLUNTEER_SUBTYPE,
+		'owner_guid' => $user->guid,
+		'metadata_names' => 'linkedin_id',
+		'limit' => false
+	));
+
+	$linkedin = array();
+	if ($user_volunteer_experiences) {
+		foreach ($user_volunteer_experiences as $user_volunteer_experience) {
+			$linkedin[$user_volunteer_experience->linkedin_id] = $user_volunteer_experience;
+		}
+	}
+
+	$volunteer_api_result = $adapter->adapter->api->profile("~:(volunteer:(volunteer-experiences:(id,role,organization,cause,start-date,end-date,description)))");
+	$volunteer_json_result = $volunteer_api_result['linkedin'];
+	$volunteer = json_decode($volunteer_json_result);
+	
+	$volunteer_experiences = $volunteer->volunteer->volunteerExperiences;
+
+	foreach ($volunteer_experiences->values as $volunteer_experience) {
+		
+		if (!in_array($volunteer_experience->id, $volunteer_experiences_input)) {
+			continue;
+		}
+
+		if ($linkedin[$volunteer_experience->id]) {
+			$action = 'update';
+			$object = $linkedin[$volunteer_experience->id];
+		} else {
+			$action = 'import';
+			$object = new ElggObject();
+			$object->subtype = LINKEDIN_VOLUNTEER_SUBTYPE;
+			$object->owner_guid = $user->guid;
+			$object->access_id = elgg_extract('volunteer_experiences', $access_input, get_default_access($user));
+
+			$object->linkedin_id = $volunteer_experience->id;
+		}
+
+		$object->title = $volunteer_experience->role;
+		$object->description = $volunteer_experience->description;
+		$object->company = $volunteer_experience->organization->name;
+		$object->company_linkedin_id = $volunteer_experience->organization->id;
+		$object->cause = $volunteer_experience->cause->name;
+
+		if ($volunteer_experience->startDate) {
+			$object->calendar_start = mktime(0, 0, 0, $volunteer_experience->startDate->month, $volunteer_experience->startDate->day, $volunteer_experience->startDate->year);
+		}
+		if ($volunteer_experience->endDate) {
+			$object->calendar_end = mktime(0, 0, 0, $volunteer_experience->endDate->month, $volunteer_experience->endDate->day, $volunteer_experience->endDate->year);
+		}
+
+		if ($object->save()) {
+			system_message(elgg_echo('hybridauth:linkedin:volunteer_experience:success:' . $action, array($object->title)));
+		} else {
+			system_message(elgg_echo('hybridauth:linkedin:volunteer_experience:error', array($object->title)));
+		}
+	}
+}
+
+
+$recommendations_input = get_input('recommendations');
+
+if (is_array($recommendations_input)) {
+
+	$user_recommendations = elgg_get_entities_from_metadata(array(
+		'types' => 'object',
+		'subtypes' => LINKEDIN_RECOMMENDATION_SUBTYPE,
+		'owner_guid' => $user->guid,
+		'metadata_names' => 'linkedin_id',
+		'limit' => false
+	));
+
+	$linkedin = array();
+	if ($user_recommendations) {
+		foreach ($user_recommendations as $user_recommendation) {
+			$linkedin[$user_recommendation->linkedin_id] = $user_recommendation;
+		}
+	}
+
+	$recommendations_api_result = $adapter->adapter->api->profile("~:(recommendations-received)");
+	$recommendations_json_result = $recommendations_api_result['linkedin'];
+	$recommendations = json_decode($recommendations_json_result);
+	
+	foreach ($recommendations->recommendationsReceived->values as $recommendation) {
+		
+		if (!in_array($recommendation->id, $recommendations_input)) {
+			continue;
+		}
+
+		if ($linkedin[$recommendation->id]) {
+			$action = 'update';
+			$object = $linkedin[$recommendation->id];
+		} else {
+			$action = 'import';
+			$object = new ElggObject();
+			$object->subtype = LINKEDIN_RECOMMENDATION_SUBTYPE;
+			$object->owner_guid = $user->guid;
+			$object->access_id = elgg_extract('recommendations', $access_input, get_default_access($user));
+
+			$object->linkedin_id = $recommendation->id;
+		}
+
+		$object->title = '';
+		$object->description = $recommendation->recommendationText;
+		$object->recommendation_type = $recommendation->recommendationType->code;
+
+		$object->recommender = "{$recommendation->recommender->firstName} {$recommendation->recommender->lastName}";
+		$object->recommender_linkedin_id = $recommendation->recommender->id;
+		
+		if ($object->save()) {
+			system_message(elgg_echo('hybridauth:linkedin:recommendation:success:' . $action, array($object->title)));
+		} else {
+			system_message(elgg_echo('hybridauth:linkedin:recommendation:error', array($object->title)));
+		}
+	}
+}
+
 forward('profile');
