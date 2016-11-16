@@ -1,0 +1,17 @@
+{
+	"name": "arckinteractive/elgg_hybridauth_linkedin",
+	"type": "elgg-plugin",
+	"repository": "ArckInteractive/elgg_hybridauth_linkedin",
+	"description": "LinkedIn Extention for Elgg HybridAuth",
+	"homepage": "http://arckinteractive.com",
+	"minimum-stability": "stable",
+	"keywords": [
+		"elgg", "plugin", "auth","linkedin"
+	],
+	"license": "GPL-2.0",
+	"authors": [
+		{
+			"name": "Ismayil Khayredinov"
+		}
+	]
+}
