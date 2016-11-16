@@ -13,5 +13,8 @@
 		{
 			"name": "Ismayil Khayredinov"
 		}
-	]
+	],
+  "require":{
+    "arckinteractive/elgg_hybridauth":"dev-master"
+  }
 }

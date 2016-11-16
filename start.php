@@ -33,6 +33,7 @@ function elgg_hybridauth_linkedin_init() {
 	// Add linkedin metatags to the list of profile fields
 	elgg_register_plugin_hook_handler('profile:fields', 'profile', 'elgg_hybridauth_linkedin_fields');
 	elgg_register_plugin_hook_handler('linkedin:fields', 'profile', 'elgg_hybridauth_linkedin_fields');
+	elgg_register_plugin_hook_handler('config', 'hybridauth', 'elgg_hybridauth_linkedin_config');
 
 	// Register widgets for LinkedIn data
 	elgg_register_widget_type('employment', elgg_echo('hybridauth:linkedin:widget:employment'), elgg_echo('hybridauth:linkedin:widget:employment:desc'), 'profile', false);
@@ -53,7 +54,7 @@ function elgg_hybridauth_linkedin_init() {
  */
 function elgg_hybridauth_linked_page_handler() {
 
-	gatekeeper();
+	elgg_gatekeeper();
 
 	$ha = new ElggHybridAuth();
 	$adapter = $ha->getAdapter('LinkedIn');
@@ -147,6 +148,26 @@ function elgg_hybridauth_linkedin_fields($hook, $type, $return) {
 	} else if ($hook == 'linkedin:fields') {
 		return array_merge($linkedin_metatags, $return);
 	}
+
+	return $return;
+}
+
+/**
+ * Prepares HybridAuth config
+ *
+ * @param string $hook   "config"
+ * @param string $type   "hybridauth"
+ * @param array  $return Config
+ * @param array  $params Hook Params
+ * @return array
+ */
+function elgg_hybridauth_linkedin_config($hook, $type, $return, $params) {
+
+	$return = (array) $return;
+
+	// Replace default LinkedIn lib
+	unset($return['providers']['LinkedIn']['wrapper']);
+	//$return['providers']['LinkedIn']['scope']='r_fullprofile';
 
 	return $return;
 }
